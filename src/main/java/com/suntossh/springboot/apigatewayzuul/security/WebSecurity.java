@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 
 @Configuration
 @EnableWebSecurity
@@ -27,6 +28,9 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().antMatchers(HttpMethod.POST, environment.getProperty("users.registration.path")).permitAll()
 		.antMatchers(HttpMethod.POST, environment.getProperty("users.login.path")).permitAll()
 		.antMatchers(environment.getProperty("users.h2console.path")).permitAll()
-		.anyRequest().authenticated();// which means it must have the valid token in the Request
+		.anyRequest().authenticated()// which means it must have the valid token in the Request
+		.and().addFilter(new AuthorizationFilter(authenticationManager(), environment));
+		
+		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}
 }
